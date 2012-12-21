@@ -35,4 +35,16 @@ fn main() {
             fail
         }
     }
+
+    let k = program.create_kernel("MyAdd");
+    
+    k.set_arg(0, &A);
+    k.set_arg(1, &B);
+    k.set_arg(2, &C);
+    k.set_arg(3, &N);
+
+    enqueue_nd_range_kernel(
+        &ctx.q,
+        &k,
+        1, 0, N as int, 1);
 }
