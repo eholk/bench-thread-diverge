@@ -39,21 +39,35 @@ fn main() {
         }
     }
 
-    let k = program.create_kernel("MyAdd");
-
-    let time = time_kernel(ctx, &k, &A, &B, &C);
-
-    io::println(fmt!("MyAdd:\t%? msec/kernel", time));
+    do_kernel(ctx, &program, "MyAdd", N, 256, &A, &B, &C);
+    do_kernel(ctx, &program, "MyAdd_2D", (N, N), (16, 16), &A, &B, &C);
 }
 
-fn time_kernel(ctx: @ComputeContext, k: &Kernel,
-               A: &Vector<f64>,
-               B: &Vector<f64>,
-               C: &Vector<f64>) -> float
+fn do_kernel<I: KernelIndex>(
+    ctx: @ComputeContext,
+    program: &Program,
+    name: &str,
+    global: I,
+    local: I,
+    A: &Vector<f64>,
+    B: &Vector<f64>,
+    C: &Vector<f64>)
 {
-    const REP: uint = 500;
+    let k = program.create_kernel(name);
+    let time = time_kernel(ctx, &k, global, local, A, B, C);
+    
+    io::println(fmt!("%s:\t%? msec/kernel", name, time));
+}
 
-    const LOCAL_SIZE: int = 256;
+fn time_kernel<I: KernelIndex>(
+    ctx: @ComputeContext, k: &Kernel,
+    global: I,
+    local: I,
+    A: &Vector<f64>,
+    B: &Vector<f64>,
+    C: &Vector<f64>) -> float
+{
+    const REP: uint = 50;
 
     k.set_arg(0, A);
     k.set_arg(1, B);
@@ -64,18 +78,12 @@ fn time_kernel(ctx: @ComputeContext, k: &Kernel,
     precise_time_s();
 
     // Do it once to avoid timing inconsistencies.
-    enqueue_nd_range_kernel(
-        &ctx.q,
-        k,
-        1, 0, N as int, LOCAL_SIZE);
+    ctx.enqueue_async_kernel(k, global, local).wait();
 
     // Loop one
     let start1 = precise_time_s();
     for REP.times || {
-        enqueue_nd_range_kernel(
-            &ctx.q,
-            k,
-            1, 0, N as int, LOCAL_SIZE);
+        ctx.enqueue_async_kernel(k, global, local).wait();
     }
     let stop1 = precise_time_s();
 
@@ -84,18 +92,12 @@ fn time_kernel(ctx: @ComputeContext, k: &Kernel,
     // Loop two
     let start2 = precise_time_s();
     for REP.times || {
-        enqueue_nd_range_kernel(
-            &ctx.q,
-            k,
-            1, 0, N as int, LOCAL_SIZE);
-        enqueue_nd_range_kernel(
-            &ctx.q,
-            k,
-            1, 0, N as int, LOCAL_SIZE);
+        ctx.enqueue_async_kernel(k, global, local).wait();
+        ctx.enqueue_async_kernel(k, global, local).wait();
     }
     let stop2 = precise_time_s();
 
     let elapsed2 = stop2 - start2;
 
-    (elapsed2 - elapsed1) / (REP as float) * 1000000f
+    (elapsed2 - elapsed1) / (REP as float) * 1000f
 }
