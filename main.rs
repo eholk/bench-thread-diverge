@@ -73,7 +73,7 @@ fn time_kernel<I: KernelIndex>(
     B: &Vector<f64>,
     C: &Vector<f64>) -> float
 {
-    const REP: uint = 50;
+    const REP: uint = 500;
 
     k.set_arg(0, A);
     k.set_arg(1, B);
