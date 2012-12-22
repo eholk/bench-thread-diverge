@@ -9,7 +9,9 @@ use OpenCL::vector::*;
 const N: uint = 1024;
 
 fn main() {
-    let ctx = create_compute_context();
+    let ctx = create_compute_context_types([GPU]);
+
+    io::println(fmt!("Using device %s", ctx.device_name()));
 
     let r = rand::Rng();
 
