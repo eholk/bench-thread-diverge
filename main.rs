@@ -42,6 +42,11 @@ fn main() {
     do_kernel(ctx, &program, "MyAdd", N, 256, &A, &B, &C);
     do_kernel(ctx, &program, "MyAdd_2D", (N, N), (16, 16), &A, &B, &C);
     do_kernel(ctx, &program, "MyAdd_2D_unweave", (N, N), (16, 16), &A, &B, &C);
+
+    do_kernel(ctx, &program, "MyAdd_col", N, 256, &A, &B, &C);
+    do_kernel(ctx, &program, "MyAdd_2D_col", (N, N), (16, 16), &A, &B, &C);
+    do_kernel(ctx, &program, "MyAdd_2D_unweave_col", (N, N), (16, 16),
+              &A, &B, &C);
 }
 
 fn do_kernel<I: KernelIndex>(
@@ -57,7 +62,7 @@ fn do_kernel<I: KernelIndex>(
     let k = program.create_kernel(name);
     let time = time_kernel(ctx, &k, global, local, A, B, C);
     
-    io::println(fmt!("%s:\t%? msec/kernel", name, time));
+    io::println(fmt!("%24s:\t%f msec/kernel", name, time));
 }
 
 fn time_kernel<I: KernelIndex>(
