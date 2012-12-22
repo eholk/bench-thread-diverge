@@ -32,3 +32,21 @@ __kernel void MyAdd_2D(const double __global *A,
     else
         get(C, N, i, j) = get(A, N, i, j) - get(A, N, i, j);
 }
+
+__kernel void MyAdd_2D_unweave(const double __global *A,
+                    const double __global *B,
+                    double __global *C,
+                    unsigned int N)
+{
+    unsigned int i = get_global_id(0);
+    unsigned int j = get_global_id(1);
+
+    if(i < N / 2) {
+        unsigned int i = 2 * i;
+        get(C, N, i, j) = get(A, N, i, j) + get(A, N, i, j);
+    }
+    else {
+        unsigned int i = 2 * i + 1;
+        get(C, N, i, j) = get(A, N, i, j) - get(A, N, i, j);
+    }
+}

@@ -41,6 +41,7 @@ fn main() {
 
     do_kernel(ctx, &program, "MyAdd", N, 256, &A, &B, &C);
     do_kernel(ctx, &program, "MyAdd_2D", (N, N), (16, 16), &A, &B, &C);
+    do_kernel(ctx, &program, "MyAdd_2D_unweave", (N, N), (16, 16), &A, &B, &C);
 }
 
 fn do_kernel<I: KernelIndex>(
