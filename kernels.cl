@@ -75,7 +75,7 @@ __kernel void MyAdd_2D_unweave(const double __global *A,
         get(C, N, i, j) = get(A, N, i, j) + get(A, N, i, j);
     }
     else {
-        unsigned long int i = 2 * i + 1;
+        unsigned long int i = 2 * (i - N / 2) + 1;
         get(C, N, i, j) = get(A, N, i, j) - get(A, N, i, j);
     }
 }
@@ -93,7 +93,7 @@ __kernel void MyAdd_2D_unweave_col(const double __global *A,
         get(C, N, i, j) = get(A, N, i, j) + get(A, N, i, j);
     }
     else {
-        unsigned long int j = 2 * j + 1;
+        unsigned long int j = 2 * (j - N / 2) + 1;
         get(C, N, i, j) = get(A, N, i, j) - get(A, N, i, j);
     }
 }
