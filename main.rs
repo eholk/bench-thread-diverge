@@ -49,6 +49,11 @@ fn main() {
     do_kernel(ctx, &program, "MyAdd_2D_col", (N, N), (16, 16), &A, &B, &C);
     do_kernel(ctx, &program, "MyAdd_2D_unweave_col", (N, N), (16, 16),
               &A, &B, &C);
+
+    do_kernel(ctx, &program, "MyAdd_2D_nobranch", (N, N), (16, 16),
+              &A, &B, &C);
+    do_kernel(ctx, &program, "MyAdd_2D_col_nobranch", (N, N), (16, 16),
+              &A, &B, &C);
 }
 
 fn do_kernel<I: KernelIndex>(

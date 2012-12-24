@@ -97,3 +97,26 @@ __kernel void MyAdd_2D_unweave_col(const double __global *A,
         get(C, N, i, j) = get(A, N, i, j) - get(B, N, i, j);
     }
 }
+
+__kernel void MyAdd_2D_nobranch(const double __global *A,
+                       const double __global *B,
+                       double __global *C,
+                       unsigned long int N)
+{
+    unsigned long int i = get_global_id(0);
+    unsigned long int j = get_global_id(1);
+
+    get(C, N, i, j) = get(A, N, i, j) + get(B, N, i, j)*(1 - ((i&1)<<1));
+}
+
+__kernel void MyAdd_2D_col_nobranch(const double __global *A,
+                       const double __global *B,
+                       double __global *C,
+                       unsigned long int N)
+{
+    unsigned long int i = get_global_id(0);
+    unsigned long int j = get_global_id(1);
+
+    get(C, N, i, j) = get(A, N, i, j) + get(B, N, i, j)*(1 - ((j&1)<<1));
+}
+
